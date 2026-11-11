@@ -1,0 +1,104 @@
+# XcodeGen のプロジェクト定義
+# Mac で `xcodegen generate` を実行すると SelfManager.xcodeproj が生成されます。
+#
+# バンドルIDを変える場合は、次の4か所をそろえて変更してください。
+#   - options.bundleIdPrefix
+#   - 各ターゲットの PRODUCT_BUNDLE_IDENTIFIER
+#   - 各ターゲットの com.apple.security.application-groups
+#   - SelfManager/Shared/AppGroup.swift の identifier
+
+name: SelfManager
+
+options:
+  bundleIdPrefix: com.tomo1
+  developmentLanguage: ja
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+    # Apple Developer の Team ID を入れると、Xcode で毎回選ばなくて済みます
+    DEVELOPMENT_TEAM: ""
+
+targets:
+  SelfManager:
+    type: application
+    platform: iOS
+    sources:
+      - path: SelfManager
+    info:
+      path: SelfManager/Info.plist
+      properties:
+        CFBundleDisplayName: 自己管理
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        NSCalendarsFullAccessUsageDescription: iPhoneのカレンダーの予定を表示・追加し、To doをこなせる空き時間を提案するために使います。
+    entitlements:
+      path: SelfManager/SelfManager.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.tomo1.selfmanager.shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tomo1.selfmanager
+        TARGETED_DEVICE_FAMILY: "1"
+    dependencies:
+      - target: SelfManagerWidget
+
+  SelfManagerWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: SelfManagerWidget
+      - path: SelfManager/Shared
+    info:
+      path: SelfManagerWidget/Info.plist
+      properties:
+        CFBundleDisplayName: 自己管理
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: SelfManagerWidget/SelfManagerWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.tomo1.selfmanager.shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tomo1.selfmanager.widget
+        TARGETED_DEVICE_FAMILY: "1"
+        SKIP_INSTALL: YES
+
+  SelfManagerTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: SelfManagerTests
+    dependencies:
+      - target: SelfManager
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.tomo1.selfmanager.tests
+
+schemes:
+  SelfManager:
+    build:
+      targets:
+        SelfManager: all
+        SelfManagerTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - SelfManagerTests

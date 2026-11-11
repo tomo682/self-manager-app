@@ -1,0 +1,15 @@
+# XcodeGen が生成するもの
+SelfManager.xcodeproj/
+SelfManager/Info.plist
+SelfManager/SelfManager.entitlements
+SelfManagerWidget/Info.plist
+SelfManagerWidget/SelfManagerWidget.entitlements
+
+# Xcode
+xcuserdata/
+DerivedData/
+build/
+*.xcuserstate
+
+# macOS
+.DS_Store
